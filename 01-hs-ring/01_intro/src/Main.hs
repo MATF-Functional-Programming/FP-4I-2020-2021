@@ -53,6 +53,27 @@ myConcat ls rs =
     foldr (:) rs ls
 
 
+-- Reverse na nekoliko nacina
+reverseRec :: [a] -> [a]
+reverseRec [] = []
+reverseRec (x:xs) = reverseRec xs ++ [x]
+
+reverseTail :: [a] -> [a]
+reverseTail lst = let reverseHelper acc lst
+                        | []     <- lst     = acc
+                        | (x:xs) <- lst     = reverseHelper (x:acc) xs
+                  in reverseHelper [] lst 
+
+reverseFoldr :: [a] -> [a]
+reverseFoldr lst = foldr (\ x acc -> acc ++ [x]) [] lst
+
+reverseFoldl :: [a] -> [a]
+reverseFoldl lst = foldl (flip (:)) [] lst
+
+
+-- Map preko folda
+myMap :: (a -> b) -> [a] -> [b]
+myMap f xs = foldr (\ x acc -> f x : acc) [] xs
 
 
 --
@@ -140,6 +161,13 @@ accumulate' f xs
         | (x:[])  <- xs  = x
         | (x:xs)  <- xs  = f x (accumulate' f xs)
 
+
+-- Quicksort
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) = quicksort smaller ++ [x] ++ quicksort bigger
+                    where smaller = [e | e <- xs, e < x]
+                          bigger = [e | e <- xs, e >= x]
 
 
 main :: IO ()

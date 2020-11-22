@@ -11,7 +11,7 @@
     ```
 
 - Vidimo da je neophodno da je tip aplikativ da bi mogao biti i alternativ
-- Potrebno je samo implementirati `<|>`. Pogledajmo na primeru kako alternativi funkcionisu (`Maybe` je alternativ):
+- Potrebno je implementirati `empty` i `<|>`. Pogledajmo na primeru kako alternativi funkcionisu (`Maybe` je alternativ):
     ```hs
     ghci> Just 3 <|> Just 1 <|> Nothing
     Just 3
@@ -20,10 +20,16 @@
     Just 1
     ```
 
-- Mozemo primeniti operator `<|>` na proizvoljno mnogo argumenata, povratna vrednost je prvi argument koji nije "specijalna vrednost". Za `Maybe` je to `Nothing`, za listu je `[]` itd.
+- `empty` je identitet za `<|>` - nula rezultata
+- Operator `<|>` - spajanje svih mogucih rezultata iz vise izracunavanje u jedno
+- Ako posmatramo `Maybe` vrednost kao rezultat nekog izracunavanja koje moze da uspe (`Just x`) i da ne uspe (`Nothing`), operator `<|>` treba da spoji dva takva izracunavanja u jedno, ali posto `Maybe` moze da sadrzi samo jedan rezultat, uzima se prvi rezultat koji postoji (odnosno prvi koji nije `Nothing`) 
+- Slicno, i liste mozemo da posmatramo kao izracunavanja koja mogu da imaju nula ili vise rezultata
+- U ovom slucaju, kada hocemo da iskombinujemo dva izracunavanja u jedno, mozemo da sacuvamo sve moguce rezultate - samo nadovezemo dve liste
 - Kako instancirati `Applicative` za `Maybe`?
     ```hs
     instance Alternative Maybe where
+        empty = Nothing
+
         Nothing <|> r = r
         l       <|> _ = l
     ```

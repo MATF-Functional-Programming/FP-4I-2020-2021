@@ -7,6 +7,7 @@ import qualified Data.Char as Ch
 import Debug.Trace (trace)
 import Data.Bifunctor
 
+import Control.Monad.Fail
 
 data Maybe a = Nothing
              | Just a
@@ -54,6 +55,9 @@ instance Monad Maybe where
     Just x  >>= f      = f x
 
     -- (>>) :: Maybe a -> Maybe b   -> Maybe b
+
+    -- fail :: String -> Maybe a
+    fail _ = Nothing
 
 
 -- Monad laws
@@ -145,6 +149,84 @@ banana _ = Nothing
 -- Nothing  
 -- ghci> return (0,0) >>= landLeft 1 >> Nothing >>= landRight 1  
 -- Nothing 
+
+
+-- do notacija
+
+test = Just 2 >>= (\ x -> Just (show x ++ "!"))
+
+-- stvari mogu da se zakomplikuju...
+uggly = Just 2 >>= (\ x -> Just "!" >>= (\ y -> Just $ show x ++ y))
+
+-- ako samo prelomimo prethodnu liniju na 3, dobijamo citljivije resenje 
+prettier :: Maybe String
+prettier = Just 2   >>= (\ x -> 
+           Just "!" >>= (\ y ->
+           Just $ show x ++ y))
+
+-- do notacija je sintaksna olaksica i sustinski se svodi na prethodni zapis
+prettiest :: Maybe String
+prettiest = do
+    x <- Just 2
+    y <- Just "!"
+    Just $ show x ++ y
+
+
+-- od neke verzije haskela, funkcija fail je prebacena u klasu MonadFail
+-- pa da bi patternMatchFail primer prosao, moze biti potrebno (u zavisnosti od verzije)
+-- da se dokaze da je Maybe instanca i ove klase
+instance MonadFail Maybe where
+    fail _ = Nothing
+
+-- razlika je posebna obrada gresaka
+-- Just x je obrazac koji ne moze da se poklopi sa Nothing
+-- inace bi to dovelo do izuzetka, ali u do notaciji se u takvim slucajevima poziva funkcija fail
+patternMatchFail = do
+    Just x <- return $ Nothing
+    Just $ x
+
+
+-- primer od malopre u do notaciji
+walk :: Maybe Pole
+walk = do
+    start  <- return (0, 0)
+    first  <- landLeft 2 start
+    -- ili sa bananom
+    -- Nothing (odnosno banana first)
+    -- ako napisemo samo monadicku vrednost bez <- u do notaciji
+    -- to je isto kao da smo iskoristili operator >>
+    second <- landRight 3 first
+    landLeft 2 second
+
+
+-- lista kao monada
+-- instance Monad [] where
+--     return x = [x]
+
+--     -- isto kao kod Maybe, necemo kutiju u kutiji, zato concat
+--     xs >>= ys = concat (fmap f xs)
+
+--     fail _ = []
+
+-- npr.
+double = [1,2] >>= (\ x -> replicate 2 x)
+
+-- isto kao kod Maybe, mozemo da pravimo lanac bind-ova
+listOfTuples :: [(Int, Char)]
+listOfTuples = [1, 2] >>= (\ n -> ['a', 'b'] >>= (\ c -> return (n, c)))
+
+listOfTuplesDo :: [(Int, Char)]
+listOfTuplesDo = do
+    n <- [1, 2]
+    c <- ['a', 'b']
+    return (n, c)
+
+-- ovo prilicno lici na list comprehension
+
+listOfTuplesCompr = [(n, c) | n <- [1, 2], c <- ['a', 'b']]
+-- list comprehension-i su u stvari sintaksna olaksica za koriscenje liste kao monade
+-- na kraju se oni, kao i do notacija prevode na bind-ove
+
 
 
 -- IO

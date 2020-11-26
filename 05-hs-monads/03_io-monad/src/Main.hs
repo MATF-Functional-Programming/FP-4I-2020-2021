@@ -48,5 +48,20 @@ main3''' = do { y <- do { x <- input "Enter question: "
 
 
 
+main4 = do
+    putStrLn "Enter name and surname:"
+    name <- getLine
+    surname <- getLine
+    putStrLn $ "Hello, " ++ concatenate name surname
 
+-- na drugi nacin
+-- IO je monada, samim tim i funktor i aplikativ
+main5 = do 
+    putStrLn "Enter name and surname:"
+    combined <- concatenate <$> getLine <*> getLine
+    putStrLn $ "Hello, " ++ combined
+
+
+concatenate :: String -> String -> String
+concatenate x y = x ++ " " ++ y
 

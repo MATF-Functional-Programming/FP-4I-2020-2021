@@ -1,0 +1,8 @@
+:set prompt "[32m"
+putStrLn "\nLoaded GHCi."
+putStr "prop_toList_fromList_conv\t"
+quickCheck prop_toList_fromList_conv
+putStr "prop_focusNext_focusPrev\t"
+quickCheck prop_focusNext_focusPrev
+putStr "prop_focusPrev_focusNext\t"
+quickCheck prop_focusPrev_focusNext

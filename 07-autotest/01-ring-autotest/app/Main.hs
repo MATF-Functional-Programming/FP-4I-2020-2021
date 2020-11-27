@@ -12,14 +12,20 @@ main = do { args <- getArgs       -- lista argumenata komandne linije
           -- ; forM_ args process -- alternativa iz Control.Monad modula
           -- for (auto &&arg: args) process(arg)
           }
- 
--- Citamo src i parsiramo imena testova, za svaki pokrecemo quickCheck
+
 process :: String -> IO ()
-process file = do { contents <- readFile file     
-                  ; let tests = getTests contents
-                  ; if null tests then putStrLn $ file ++ ": nothing to test"
-                                  else executeTests file tests
-                  }
+process file = if isHaskellExtension then processSource file
+                                     else putStrLn $ file ++ ": not .hs file"
+    where fileExt = drop (length file - 3) file 
+          isHaskellExtension = fileExt == ".hs"
+
+-- Citamo src i parsiramo imena testova, za svaki pokrecemo quickCheck
+processSource :: String -> IO ()
+processSource file = do { contents <- readFile file     
+                        ; let tests = getTests contents
+                        ; if null tests then putStrLn $ file ++ ": nothing to test"
+                                        else executeTests file tests
+                        }
 
 -- Pravimo script koji ce izvrsiti test
 executeTests :: String -> [String] -> IO ()

@@ -1,0 +1,13 @@
+
+cabal sandbox init
+
+cabal init
+
+cabal install gloss
+cabal install gloss-game
+
+> import Graphics.Gloss
+> import Graphics.Gloss.Game
+
+
+

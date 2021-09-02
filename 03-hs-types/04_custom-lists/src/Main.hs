@@ -44,7 +44,7 @@ instance Foldable OList where
     foldl f acc End        = acc
     foldl f acc (x :/: xs) =
             let newAcc = f acc x
-            in  foldr f newAcc xs
+            in  foldl f newAcc xs
 
     foldr f init End        = init
     foldr f init (x :/: xs) =
